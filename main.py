@@ -2,8 +2,6 @@ import threading
 import requests,time,os
 from threading import Thread
 from itertools import cycle
-
-from requests.sessions import session
 def tokenjoiner(session,token,proxies,invite):
     headers = {
         "Authorization": token,
@@ -11,14 +9,14 @@ def tokenjoiner(session,token,proxies,invite):
     }
     prox = {"http":f"socks5://{next(proxies)}"}
     resp = session.post(f"https://canary.discord.com/api/v8/invites/{invite}",headers=headers,proxies=prox)
-    if resp.status_code == 200 or 204 or 201:
+    if resp.status_code == 200:
         print("Joined the guild")
     elif resp.status_code == 429:
         print("Rate limited exiting the script")
         time.sleep(1)
         os._exit(0)
     else:
-        print("Invalid Token")
+        print("Invalid invite or token")
 def checker(session,token,proxies):
     valid = open("tokens.txt","w")
     headers = {
@@ -27,9 +25,12 @@ def checker(session,token,proxies):
     }
     proxy = {"http":f"socks5://{next(proxies)}"}
     resp = session.get("https://canary.discord.com/api/v8/users/@me",headers = headers,proxies = proxy)
-    if resp.status_code == 200 or 204 or 201:
-        valid.write(resp.request.headers["authorization"] + '\n')
-        print("{0} valid ".format(resp.request.headers["authorization"]))
+    if resp.status_code == 200:
+        valid.write(token + '\n')
+        print("{0} valid ".format(token))
+    elif resp.status_code == 429:
+        print("Rate limited exiting code")
+        os._exit(0)
     else:
         print("Invalid token")
 def main():
