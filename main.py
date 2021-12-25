@@ -39,23 +39,27 @@ def main():
     proxylist = open("proxies.txt","r").read().splitlines()
     proxies = cycle(proxylist)
     choice = input(" [1] Token Checker\n [2] Token Joiner\n [3] Exit\nChoice: ")
-    if choice == "1":
-        for user in open("tokens.txt","r").read().splitlines():
-            lock.acquire()
-            Thread(target=checker,args=(session,user,proxies)).start()
-            lock.release()
-        main()
-    elif choice == "2":
-        invite = input("Invite Code:  ")
-        for user in open("tokens.txt","r").read().splitlines():
+    tokens = open("tokens.txt","r").read().splitlines()
+    if len(tokens) == 0:
+        print("Paste your tokens in tokens.txt")
+    else:
+        if choice == "1":
+            for user in tokens:
+                lock.acquire()
+                Thread(target=checker,args=(session,user,proxies)).start()
+                lock.release()
+            main()
+        elif choice == "2":
+            invite = input("Invite Code:  ")
+            for user in open("tokens.txt","r").read().splitlines():
             try:
                 lock.acquire()
                 Thread(target=tokenjoiner,args=(session,user,proxies,invite)).start()
                 lock.release()
             except Exception as e:
                 print(e)
-        main()
-    else:
-        os._exit(1)
+            main()
+        else:
+            os._exit(1)
 if __name__ == "__main__":
     main()
