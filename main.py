@@ -12,9 +12,7 @@ def tokenjoiner(session,token,proxies,invite):
     if resp.status_code == 200:
         print("Joined the guild")
     elif resp.status_code == 429:
-        print("Rate limited exiting the script")
-        time.sleep(1)
-        os._exit(0)
+        Thread(target=tokenjoiner,args=(session,token,proxies,invite)).start()
     else:
         print("Invalid invite or token")
 def checker(session,token,proxies):
@@ -29,8 +27,7 @@ def checker(session,token,proxies):
         valid.write(token + '\n')
         print("{0} valid ".format(token))
     elif resp.status_code == 429:
-        print("Rate limited exiting code")
-        os._exit(0)
+        Thread(target=checker,args=(session,token,proxies)).start()
     else:
         print("Invalid token")
 def main():
